@@ -1,16 +1,15 @@
 <div align="center">
   <img src="assets/img/logo_earthbeat.png" alt="EarthBeat logo" width="200" height="200">
-  <h1>EarthBeat</h1>
 </div>
 
 <p>
-  EarthBeat e' un progetto per governare elettrovalvole e sensori agricoli usando Raspberry Pi 3 B+ collegati tra loro in una rete Wi-Fi mesh software, con un nodo master che orchestra anche se stesso come primo slave.
+  EarthBeat e' un progetto per governare elettrovalvole e sensori agricoli usando Raspberry Pi 3 B+, con un nodo master che orchestra anche se stesso come primo slave. La rete mesh e' un obiettivo del progetto, ma verra' introdotta dopo un primo MVP locale basato su script minimi per configurazione, lettura sensori e attivazione relay.
 </p>
 
 <h2>Obiettivo</h2>
 
 <p>
-  Il sistema deve permettere a uno smartphone di collegarsi alla rete esposta dai Raspberry e raggiungere il master anche passando da uno slave, senza access point fisici esterni. Il master deve mostrare una web app locale per controllare tutti i nodi, leggere umidita' e pH del terreno, comandare relay ed eseguire automazioni.
+  Il sistema deve permettere di configurare un Raspberry come master o slave tramite due pin GPIO, leggere dati da sensori di umidita' e pH del terreno, comandare elettrovalvole tramite relay e applicare fail-safe locali. In una fase successiva lo smartphone dovra' potersi collegare alla rete esposta dai Raspberry e raggiungere il master anche passando da uno slave, senza access point fisici esterni.
 </p>
 
 <h3>Vincoli iniziali</h3>
@@ -25,13 +24,23 @@
   <li>Il master e' anche un nodo operativo locale, quindi controlla relay e sensori come gli slave.</li>
 </ul>
 
-<h2>Nota tecnica sulla mesh</h2>
+<h2>Approccio iniziale</h2>
 
 <p>
-  La versione iniziale prova a ottenere una mesh vera usando lo stesso adattatore Wi-Fi integrato dei Raspberry Pi. Questo e' il punto piu' rischioso del progetto: una singola interfaccia Wi-Fi deve gestire sia il collegamento mesh tra nodi sia, idealmente, l'accesso dello smartphone.
+  La prima versione non parte dalla rete mesh. Parte invece dal controllo affidabile del singolo nodo: configurazione, GPIO, relay, sensori, log e fail-safe. Questa scelta permette di validare subito la parte fisica del progetto e di ridurre le variabili prima di introdurre il layer rete.
 </p>
 
-<h3>Roadmap realistica della rete</h3>
+<p>
+  Il software applicativo deve restare indipendente dalla rete: master, slave, letture e comandi devono poter funzionare prima in locale, poi via collegamento diretto, e infine sopra una mesh vera.
+</p>
+
+<h2>Nota tecnica sulla mesh futura</h2>
+
+<p>
+  La mesh resta un requisito di progetto, ma non e' la prima milestone. Quando verra' introdotta, la versione desiderata provera' a ottenere una mesh vera usando lo stesso adattatore Wi-Fi integrato dei Raspberry Pi. Questo e' il punto piu' rischioso del progetto: una singola interfaccia Wi-Fi deve gestire sia il collegamento mesh tra nodi sia, idealmente, l'accesso dello smartphone.
+</p>
+
+<h3>Roadmap realistica della rete futura</h3>
 
 <ol>
   <li>Prima validare una mesh tra Raspberry con <code>batman-adv</code> su Raspberry Pi OS.</li>
@@ -40,10 +49,10 @@
 </ol>
 
 <p>
-  Il software applicativo deve quindi essere progettato in modo indipendente dalla rete: se in futuro si passa a chiavette Wi-Fi, OpenWrt o altra topologia, API, MQTT e logica dei nodi non devono cambiare in modo sostanziale.
+  Se in futuro si passa a chiavette Wi-Fi, OpenWrt o altra topologia, API, MQTT e logica dei nodi non devono cambiare in modo sostanziale.
 </p>
 
-<h2>Architettura prevista</h2>
+<h2>Architettura prevista a regime</h2>
 
 <pre><code>Smartphone
    |
@@ -92,7 +101,7 @@ Master orchestratore</code></pre>
 <h3>Master</h3>
 
 <ul>
-  <li>Partecipa alla mesh.</li>
+  <li>Partecipa alla rete dei nodi, prima in locale/test e poi in mesh.</li>
   <li>Espone la web app per smartphone.</li>
   <li>Esegue il broker MQTT locale.</li>
   <li>Mantiene registry dei nodi.</li>
@@ -103,7 +112,7 @@ Master orchestratore</code></pre>
 <h3>Slave</h3>
 
 <ul>
-  <li>Partecipa alla mesh.</li>
+  <li>Partecipa alla rete dei nodi, prima in locale/test e poi in mesh.</li>
   <li>Legge sensori locali.</li>
   <li>Comanda relay locali.</li>
   <li>Pubblica telemetria al master.</li>
@@ -117,17 +126,18 @@ Master orchestratore</code></pre>
 
 <ul>
   <li>Sistema operativo: Raspberry Pi OS Lite.</li>
-  <li>Rete mesh: <code>batman-adv</code> e strumenti Linux standard.</li>
   <li>Backend master: Python.</li>
-  <li>API/web UI: FastAPI oppure Flask, da scegliere dopo il prototipo rete.</li>
-  <li>Messaggi master/slave: MQTT con Mosquitto.</li>
+  <li>Script minimi: Python standard library dove possibile.</li>
+  <li>API/web UI: FastAPI oppure Flask, da introdurre dopo il prototipo hardware.</li>
+  <li>Messaggi master/slave: MQTT con Mosquitto, da introdurre dopo i test locali.</li>
   <li>Persistenza: SQLite.</li>
   <li>GPIO: <code>gpiozero</code> o libreria GPIO disponibile sulla versione di Raspberry Pi OS scelta.</li>
   <li>ADC per sensori analogici: ADS1115 o MCP3008.</li>
+  <li>Rete mesh futura: <code>batman-adv</code> e strumenti Linux standard.</li>
 </ul>
 
 <p>
-  Per l'MVP si puo' anche rimandare MQTT e usare HTTP tra master e slave, ma MQTT resta preferibile appena ci sono piu' nodi perche' semplifica heartbeat, telemetria e comandi.
+  Per l'MVP si rimandano MQTT, web UI e mesh. Prima devono esistere script locali affidabili per configurare il nodo, leggere i dati e attivare i relay in sicurezza.
 </p>
 
 <h2>Roadmap</h2>
@@ -142,70 +152,96 @@ Master orchestratore</code></pre>
 
 <p><strong>Stato:</strong> in corso.</p>
 
-<h3>Fase 1 - Prova rete mesh minima</h3>
+<h3>Fase 1 - Script minimi di configurazione nodo</h3>
 
 <p>
-  <strong>Obiettivo:</strong> dimostrare che tre Raspberry Pi 3 B+ comunicano in multi-hop senza AP esterni.
+  <strong>Obiettivo:</strong> creare una base software minima per identificare e configurare un nodo Raspberry senza dipendere dalla rete.
 </p>
 
 <p><strong>Attivita':</strong></p>
 
 <ul>
-  <li>Installare Raspberry Pi OS Lite su 3 nodi.</li>
-  <li>Configurare hostname univoci, per esempio <code>earthbeat-master</code>, <code>earthbeat-node-01</code>, <code>earthbeat-node-02</code>.</li>
-  <li>Abilitare <code>batman-adv</code>.</li>
-  <li>Configurare interfaccia Wi-Fi in modalita' ad-hoc/mesh compatibile.</li>
-  <li>Creare interfaccia <code>bat0</code>.</li>
-  <li>Assegnare IP statici.</li>
-  <li>Verificare ping diretto e multi-hop.</li>
-  <li>Misurare stabilita', latenza e riconvergenza.</li>
+  <li>Creare struttura iniziale <code>src/</code>, <code>scripts/</code> e <code>config/</code>.</li>
+  <li>Definire un file di configurazione locale semplice, per esempio JSON o TOML.</li>
+  <li>Creare uno script per leggere i due GPIO di ruolo.</li>
+  <li>Creare uno script per stampare configurazione, hostname e ruolo rilevato.</li>
+  <li>Definire convenzioni per <code>node_id</code>, nome zona e modalita' master/slave.</li>
+  <li>Preparare documentazione per installazione su Raspberry Pi OS Lite.</li>
 </ul>
 
 <p><strong>Criterio di successo:</strong></p>
 
-<pre><code>node-02 -&gt; node-01 -&gt; master</code></pre>
+<pre><code>python scripts/node_status.py
+# node_id=earthbeat-master
+# role=master_local_slave</code></pre>
 
 <p>
-  Il master deve essere raggiungibile anche quando il nodo piu' lontano non vede direttamente il master.
+  Il nodo deve riconoscere il proprio ruolo e stampare uno stato leggibile senza servizi di rete.
 </p>
 
-<h3>Fase 2 - Accesso smartphone</h3>
+<h3>Fase 2 - Attivazione relay</h3>
 
 <p>
-  <strong>Obiettivo:</strong> collegare uno smartphone da un punto qualsiasi della rete.
+  <strong>Obiettivo:</strong> comandare in sicurezza almeno un relay collegato a una futura elettrovalvola.
 </p>
 
 <p><strong>Attivita':</strong></p>
 
 <ul>
-  <li>Verificare se la configurazione con singola Wi-Fi permette un SSID accessibile al telefono.</li>
-  <li>Testare raggiungibilita' della web UI del master da smartphone.</li>
-  <li>Documentare limitazioni reali di roaming, banda e stabilita'.</li>
+  <li>Definire mappa GPIO relay.</li>
+  <li>Creare script <code>relay_on.py</code>, <code>relay_off.py</code> e <code>relay_pulse.py</code>.</li>
+  <li>Imporre una durata massima per ogni apertura temporizzata.</li>
+  <li>Garantire stato sicuro all'avvio e alla chiusura dello script.</li>
+  <li>Loggare ogni cambio stato relay.</li>
 </ul>
 
 <p><strong>Criterio di successo:</strong></p>
 
-<pre><code>Smartphone -&gt; nodo vicino -&gt; mesh -&gt; master web UI</code></pre>
+<pre><code>python scripts/relay_pulse.py --relay valve_1 --seconds 5</code></pre>
 
 <p>
-  Se non e' fattibile con una sola interfaccia Wi-Fi, questa fase deve produrre una decisione tecnica documentata, non una riscrittura applicativa.
+  Il relay si attiva per il tempo richiesto e poi torna spento anche in caso di errore gestito.
 </p>
 
-<h3>Fase 3 - Nodo hardware locale</h3>
+<h3>Fase 3 - Lettura sensori</h3>
 
 <p>
-  <strong>Obiettivo:</strong> controllare un nodo singolo senza rete.
+  <strong>Obiettivo:</strong> leggere umidita' e pH dal nodo locale con output normalizzato.
 </p>
 
 <p><strong>Attivita':</strong></p>
 
 <ul>
-  <li>Leggere due GPIO per determinare il ruolo.</li>
-  <li>Controllare almeno un relay.</li>
-  <li>Leggere un sensore umidita'.</li>
-  <li>Leggere pH tramite ADC.</li>
-  <li>Esporre stato locale.</li>
-  <li>Definire fail-safe per relay e valvole.</li>
+  <li>Definire modello ADC: ADS1115 o MCP3008.</li>
+  <li>Creare script per lettura grezza ADC.</li>
+  <li>Creare script per lettura umidita' normalizzata.</li>
+  <li>Creare script per lettura pH con parametri di calibrazione.</li>
+  <li>Produrre output testuale e JSON.</li>
+  <li>Segnalare valori fuori range o sensore non valido.</li>
+</ul>
+
+<p><strong>Criterio di successo:</strong></p>
+
+<pre><code>python scripts/read_sensors.py --json
+{
+  "soil_moisture": 42.5,
+  "ph": 6.8
+}</code></pre>
+
+<h3>Fase 4 - Nodo locale completo</h3>
+
+<p>
+  <strong>Obiettivo:</strong> unire ruolo, relay e sensori in un solo comando locale di stato e controllo.
+</p>
+
+<p><strong>Attivita':</strong></p>
+
+<ul>
+  <li>Creare comando unico <code>earthbeat-node</code> o script equivalente.</li>
+  <li>Mostrare stato ruolo, sensori e relay.</li>
+  <li>Eseguire comandi relay con timeout obbligatorio.</li>
+  <li>Salvare log locali.</li>
+  <li>Preparare test senza hardware usando backend mock.</li>
 </ul>
 
 <p><strong>Criterio di successo:</strong></p>
@@ -216,33 +252,23 @@ Master orchestratore</code></pre>
   <li>Al riavvio torna in stato sicuro.</li>
 </ul>
 
-<h3>Fase 4 - Master orchestratore</h3>
+<h3>Fase 5 - Master locale e prima interfaccia</h3>
 
 <p>
-  <strong>Obiettivo:</strong> creare il primo controllo centralizzato.
+  <strong>Obiettivo:</strong> trasformare il master in orchestratore locale, mantenendolo anche come primo slave.
 </p>
 
 <p><strong>Attivita':</strong></p>
 
 <ul>
-  <li>Web UI locale.</li>
-  <li>API per nodi e smartphone.</li>
-  <li>Database SQLite.</li>
-  <li>Registro nodi.</li>
-  <li>Stato online/offline.</li>
-  <li>Comandi manuali per valvole.</li>
-  <li>Storico misure.</li>
+  <li>Creare servizio master locale.</li>
+  <li>Usare SQLite per configurazione, stato e storico.</li>
+  <li>Esporre API o CLI per leggere lo stato del master.</li>
+  <li>Comandare i relay locali del master.</li>
+  <li>Preparare una prima web UI minimale solo dopo che CLI e script sono stabili.</li>
 </ul>
 
-<p><strong>Criterio di successo:</strong></p>
-
-<ul>
-  <li>Lo smartphone vede tutti i nodi registrati.</li>
-  <li>Lo smartphone comanda una valvola locale sul master.</li>
-  <li>Lo smartphone visualizza umidita' e pH del master.</li>
-</ul>
-
-<h3>Fase 5 - Comunicazione master/slave</h3>
+<h3>Fase 6 - Comunicazione master/slave</h3>
 
 <p>
   <strong>Obiettivo:</strong> collegare slave reali al master.
@@ -251,7 +277,7 @@ Master orchestratore</code></pre>
 <p><strong>Attivita':</strong></p>
 
 <ul>
-  <li>Definire protocollo MQTT o HTTP.</li>
+  <li>Definire protocollo MQTT o HTTP partendo dagli output JSON gia' creati.</li>
   <li>Implementare heartbeat.</li>
   <li>Implementare pubblicazione sensori.</li>
   <li>Implementare comandi relay.</li>
@@ -265,7 +291,7 @@ earthbeat/nodes/&lt;node_id&gt;/sensors
 earthbeat/nodes/&lt;node_id&gt;/commands
 earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
 
-<h3>Fase 6 - Automazioni</h3>
+<h3>Fase 7 - Automazioni</h3>
 
 <p>
   <strong>Obiettivo:</strong> rendere il sistema utile senza intervento continuo.
@@ -283,7 +309,31 @@ earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
   <li>Log decisioni automatiche.</li>
 </ul>
 
-<h3>Fase 7 - Robustezza di campo</h3>
+<h3>Fase 8 - Rete mesh e accesso smartphone</h3>
+
+<p>
+  <strong>Obiettivo:</strong> introdurre la mesh vera solo dopo che il nodo locale e la comunicazione master/slave funzionano.
+</p>
+
+<p><strong>Attivita':</strong></p>
+
+<ul>
+  <li>Installare Raspberry Pi OS Lite su almeno 3 nodi.</li>
+  <li>Configurare hostname univoci, per esempio <code>earthbeat-master</code>, <code>earthbeat-node-01</code>, <code>earthbeat-node-02</code>.</li>
+  <li>Abilitare <code>batman-adv</code>.</li>
+  <li>Configurare interfaccia Wi-Fi in modalita' ad-hoc/mesh compatibile.</li>
+  <li>Creare interfaccia <code>bat0</code>.</li>
+  <li>Assegnare IP statici.</li>
+  <li>Verificare ping diretto e multi-hop.</li>
+  <li>Testare accesso smartphone verso il master passando da un nodo vicino.</li>
+  <li>Misurare stabilita', latenza e riconvergenza.</li>
+</ul>
+
+<p><strong>Criterio di successo:</strong></p>
+
+<pre><code>Smartphone -&gt; nodo vicino -&gt; mesh -&gt; master web UI</code></pre>
+
+<h3>Fase 9 - Robustezza di campo</h3>
 
 <p>
   <strong>Obiettivo:</strong> preparare il sistema per uso reale.
@@ -295,8 +345,8 @@ earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
   <li>Watchdog servizi.</li>
   <li>Backup configurazione.</li>
   <li>Recovery mode via GPIO.</li>
-  <li>Pagina diagnostica rete.</li>
-  <li>Qualita' link mesh.</li>
+  <li>Pagina diagnostica rete, quando la mesh sara' attiva.</li>
+  <li>Qualita' link mesh, quando la mesh sara' attiva.</li>
   <li>Protezione da relay bloccato.</li>
   <li>Gestione perdita alimentazione.</li>
   <li>Procedure di aggiornamento.</li>
@@ -333,5 +383,5 @@ earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
 <h2>Stato corrente</h2>
 
 <p>
-  Il progetto e' nella fase di definizione. La prima milestone tecnica vera e' la validazione della mesh su Raspberry Pi OS usando il solo Wi-Fi integrato.
+  Il progetto e' nella fase di definizione. La prima milestone tecnica vera e' la creazione degli script minimi per configurare il nodo, leggere sensori e attivare relay in sicurezza. La rete mesh verra' introdotta dopo.
 </p>
