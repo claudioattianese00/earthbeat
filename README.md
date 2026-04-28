@@ -368,6 +368,18 @@ earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
 <p>
   Il progetto deve trattare ogni comando di apertura valvola come temporaneo: ogni apertura deve avere una durata massima esplicita.
 </p>
+## Evoluzioni Future e Scalabilità del Sistema
+
+Il design modulare di **EarthBeat** ne permette l’espansione verso funzionalità di agricoltura di precisione, trasformando il nodo master in un vero e proprio centro decisionale avanzato.
+
+### Integrazioni previste in Roadmap
+* **Fertirrigazione automatizzata**: Implementazione di pompe peristaltiche controllate in **PWM** per il dosaggio di nutrienti liquidi direttamente nel flusso d'irrigazione.
+* **Modelli previsionali AI**: Integrazione di modelli che incrociano i dati storici dei sensori locali con micro-stazioni meteorologiche (anemometri e sensori di radiazione PAR) per calcolare l’evapotraspirazione reale e prevenire lo stress idrico.
+* **Estensione del raggio d'azione**: Adozione di moduli **LoRaWAN** affiancati alla mesh Wi-Fi per estendere il raggio d'azione della telemetria a diversi chilometri, mantenendo la mesh per i comandi ad alta frequenza.
+* **Computer Vision on-edge**: Integrazione di camere dedicate per il monitoraggio dello stato di salute delle colture tramite l'analisi dell'indice **NDVI** direttamente dal bordo campo.
+
+### Obiettivo a lungo termine
+Trasformare la rete di nodi da semplice sistema di attuazione a un **ecosistema distribuito intelligente**, capace di adattare i cicli di irrigazione e nutrimento in tempo reale basandosi sulle reali necessità biologiche della pianta e sulle condizioni climatiche previste.
 
 <h2>Domande aperte</h2>
 
