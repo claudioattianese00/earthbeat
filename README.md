@@ -385,3 +385,25 @@ earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
 <p>
   Il progetto e' nella fase di definizione. La prima milestone tecnica vera e' la creazione degli script minimi per configurare il nodo, leggere sensori e attivare relay in sicurezza. La rete mesh verra' introdotta dopo.
 </p>
+
+# Analisi dei Costi per la fase Pilota - Progetto EarthBeat
+* La fase pilota considera l'impianto agricolo formato da 48 elettrovalvole collegate da 6 nodi (8 Elettrovalvole a nodo). In questa fase implementeremo anche i sensori di umidità e PH.
+  
+| Pezzo | Quantità | Prezzo Totale | Prezzo/pz | Link acquisto |
+| :--- | :---: | :---: | :---: | :--- |
+| **Elettrovalvola** | 50 | 686,00 € | 13,72 € | [Alibaba Link](https://www.alibaba.com/product-detail/1-Solenoid-Valve-24V-AC-_or_1601308197575.html) |
+| **Raspberry Pi 3B PLUS generazione B** | 6 | 213,00 € | 35,50 € | [Alibaba Link](https://www.alibaba.com/product-detail/Raspberry-Pi-3B-PLUS-Generation-B_1600634669456.html) |
+| **Modulo Relè a 8 Canali 24V** | 6 | 15,00 € | 2,50 € | [Alibaba Link](https://www.alibaba.com/product-detail/1-2-4-6-8-Channel_1601668673709.html) |
+| **ADS1115 16 Bit ADC Module** | 6 | 9,00 € | 1,50 € | [Alibaba Link](https://www.alibaba.com/product-detail/Hot-Selling-16-Bit-I2C-ADS1115_62061259873.html) |
+| **Sensori umidità** | 12 | 17,00 € | 1,42 € | [Alibaba Link](https://www.alibaba.com/product-detail/Capacitive-soil-moisture-sensor-Corrosion-Resistant_1601395418812.html) |
+| **Sensori PH** | 6 | 6,00 € | 1,00 € | [Alibaba Link](https://www.alibaba.com/product-detail/TSLJSLY-RS485-4-20mA-Soil-Temperature_1601420836516.html) |
+| **Trasformatori** | 6 | 78,00 € | 13,00 € | [Alibaba Link](https://www.alibaba.com/product-detail/IP67-Constant-Voltage-12V-24V-Transformer_1601444158296.html) |
+| **Case** | 6 | 36,00 € | 6,00 € | [Alibaba Link](https://www.alibaba.com/product-detail/Electric-Cabinet-Fiberglass-Fiberglass-Project-Box_1601300142413.html) |
+| **Cavi** | 246 | 344,40 € | 1,40 € | [Amazon Link](https://www.amazon.it/Zenitech-Alimentazione-Apparecchi-AllAbrasione/dp/B0716D7XZY/) |
+| **TOTALE** | | **1.404,40 €** | | |
+
+---
+
+**Note sul preventivo:**
+* I costi tengono conto anche di eventuale spedizione per singolo pz; non è stata testata l'ipotesi di fare un'unica spedizione (potrebbero ridursi ulteriormente i costi).
+* Da confermare i singoli pezzi elettronici (forse i sensori del PH non sono quelli adatti al caso)
