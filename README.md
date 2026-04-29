@@ -400,7 +400,10 @@ earthbeat/nodes/&lt;node_id&gt;/events</code></pre>
 | **Trasformatori** | 6 | 78,00 € | 13,00 € | [Alibaba Link](https://www.alibaba.com/product-detail/IP67-Constant-Voltage-12V-24V-Transformer_1601444158296.html) |
 | **Case** | 6 | 36,00 € | 6,00 € | [Alibaba Link](https://www.alibaba.com/product-detail/Electric-Cabinet-Fiberglass-Fiberglass-Project-Box_1601300142413.html) |
 | **Cavi** | 246 | 344,40 € | 1,40 € | [Amazon Link](https://www.amazon.it/Zenitech-Alimentazione-Apparecchi-AllAbrasione/dp/B0716D7XZY/) |
-| **TOTALE** | | **1.404,40 €** | | |
+| **7" Touchscreen Display (DSI)** | 1 | 55,00 € | 55,00 € | [Alibaba Link](https://www.alibaba.com/product-detail/7-inch-DSI-Interface-Capacitive-Touch_1600465561574.html) |
+| **Modulo RTC DS3231 (Orologio)** | 1 | 2,50 € | 2,50 € | [Alibaba Link](https://www.alibaba.com/product-detail/DS3231-AT24C32-IIC-High-Precision-Real_60505166440.html) |
+| **MicroSD 32GB High Endurance** | 1 | 12,00 € | 12,00 € | [Amazon Link](https://www.amazon.it/SanDisk-Endurance-microSDHC-adattatore-Monitoraggio/dp/B07P14QHB7/) |
+| **TOTALE** | | **1.488,90 €** | | |
 
 ---
 
